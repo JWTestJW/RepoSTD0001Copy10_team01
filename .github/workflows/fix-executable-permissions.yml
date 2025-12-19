@@ -1,0 +1,31 @@
+name: Fix Executable Permissions
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  fix-permissions:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set executable permissions for .githooks
+        run: |
+          chmod +x .githooks/* || true
+
+      - name: Commit and push changes if any
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          if ! git diff --quiet; then
+            git add -u
+            git commit -m "Fix executable permissions automatically"
+            git push
+          else
+            echo "No permission changes detected."
+          fi
